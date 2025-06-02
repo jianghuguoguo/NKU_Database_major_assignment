@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>包裹记录 - 快递管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* 可复用 dashboard.html 的样式，以下为精简版 */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #F8F9FA;
+            color: #2C3E50;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #2A5C82, #1A4466);
+            padding: 1.5rem;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand h1 {
+            color: white;
+            font-size: 1.8rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            color: rgba(255,255,255,0.9);
+            padding: 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: #5BA4E6;
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #2A5C82;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- 左侧导航栏 -->
+        <nav class="sidebar">
+            <div class="brand">
+                <h1><i class="fas fa-shipping-fast"></i> 物流通</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <i class="fas fa-home"></i> 仪表盘
+                </a>
+                <a href="{{ url_for('personnel')}}" class="nav-item">
+                    <i class="fas fa-box-open"></i> 人员信息
+                </a>
+                <a href="{{ url_for('orders') }}" class="nav-item">
+                    <i class="fas fa-box-open"></i> 订单记录
+                </a>
+                <a href="{{ url_for('commodities') }}" class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i> 物流信息
+                </a>
+                <a href="{{ url_for('add_order') }}" class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i> 创建订单
+                </a>
+                <a href="{{ url_for('evaluation') }}" class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i> 订单评价
+                </a>
+                <a href="{{ url_for('commodity_view') }}" class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i> 一键查询
+                </a>
+
+                <a href="{{ url_for('logout') }}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i> 退出登录
+                </a>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <!-- ...existing code... -->
+<main class="main-content">
+    <h2>订单物流信息查询</h2>
+
+    <div style="display: flex; justify-content: center; margin-bottom: 2rem;">
+    <form method="get" action="{{ url_for('commodity_view') }}" style="display: flex; align-items: center; gap: 1rem;">
+        <label for="orderID" style="font-size: 1.1rem;">订单编号：</label>
+        <input type="text" name="orderID" id="orderID" value="{{ order_filter or '' }}" style="width: 150px; height: 2.2rem; font-size: 1.1rem; padding: 0 10px;">
+        <label for="commodityID" style="font-size: 1.1rem;">货物编号：</label>
+        <input type="text" name="commodityID" id="commodityID" value="{{ commodity_filter or '' }}" style="width: 150px; height: 2.2rem; font-size: 1.1rem; padding: 0 10px;">
+        <label for="courierID" style="font-size: 1.1rem;">快递员编号：</label>
+        <input type="text" name="courierID" id="courierID" value="{{ courier_filter or '' }}" style="width: 150px; height: 2.2rem; font-size: 1.1rem; padding: 0 10px;">
+        <button type="submit" style="height: 2.2rem; font-size: 1.1rem;">查询</button>
+    </form>
+</div>
+<!-- ...existing code... -->
+
+    {% if commodities %}
+    <table>
+    <thead>
+        <tr>
+            <th>货物ID</th>
+            <th>状态</th>
+            <th>物流时间线</th>
+            <th>预计送达时间</th>
+            <th>快递员ID</th>
+            <th>快递员姓名</th>
+            <th>订单ID</th>
+            <th>收货地址</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for c in commodities %}
+        <tr>
+            <td>{{ c.commodityID }}</td>
+            <td>{{ c.cstatus }}</td>
+            <td>{{ c.logistic_timeline }}</td>
+            <td>{{ c.Expdeliverytime }}</td>
+            <td>{{ c.courierID }}</td>
+            <td>{{ c.courier_name }}</td>
+            <td>{{ c.orderID }}</td>
+            <td>{{ c.reciptaddr }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+    {% else %}
+        <p style="text-align: center; color: gray;">未找到符合条件的订单信息。</p>
+    {% endif %}
+
+</body>
+</html>

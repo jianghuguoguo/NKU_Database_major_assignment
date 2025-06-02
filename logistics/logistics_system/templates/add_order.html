@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>添加订单 - 快递管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #F8F9FA;
+            color: #2C3E50;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: #2A5C82;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            color: rgba(255,255,255,0.9);
+            padding: 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500; /* 修复字体跳动 */
+            white-space: nowrap;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            font-weight: 500;
+        }
+        .nav-item.active {
+            background: #5BA4E6;
+            font-weight: 500;
+        }
+
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .form-card {
+            background: white;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-card h2 {
+            text-align: center;
+            color: #2A5C82;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-card label {
+            font-weight: bold;
+            display: block;
+            margin-top: 1rem;
+        }
+
+        .form-card input[type="text"] {
+            width: 100%;
+            padding: 0.6rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .form-card button {
+            width: 100%;
+            background: #2A5C82;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            margin-top: 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .form-card button:hover {
+            background: #1A4466;
+        }
+
+        .form-card p {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .form-card a {
+            color: #2A5C82;
+            text-decoration: none;
+        }
+
+        .form-card a:hover {
+            text-decoration: underline;
+        }
+        .form-control {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.3rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- 左侧导航栏 -->
+        <nav class="sidebar">
+            <div class="brand">
+                <h1><i class="fas fa-shipping-fast"></i> 物流通</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <i class="fas fa-home"></i> 仪表盘
+                </a>
+                <a href="{{ url_for('personnel') }}" class="nav-item">
+                    <i class="fas fa-users"></i> 人员信息
+                </a>
+                <a href="{{ url_for('orders') }}" class="nav-item">
+                    <i class="fas fa-box"></i> 订单记录
+                </a>
+                <a href="{{ url_for('commodities') }}" class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i> 物流信息
+                </a>
+                <a href="{{ url_for('add_order') }}" class="nav-item active">
+                    <i class="fas fa-plus-circle"></i> 创建订单
+                </a>
+                <a href="{{ url_for('evaluation') }}" class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i> 订单评价
+                </a>
+                <a href="{{ url_for('commodity_view') }}" class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i> 一键查询
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i> 退出登录
+                </a>
+            </div>
+        </nav>
+
+        <!-- 右侧主内容 -->
+        <main class="main-content">
+            <div class="form-card">
+                <h2>新建订单</h2>
+    {% if error_msg %}
+    <div style="color: red">{{ error_msg }}</div>
+    {% endif %}
+    
+    <script>
+// 增强版地址自动填充
+function fillAddress(selectElement, targetField) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const address = selectedOption.dataset.address;
+    
+    // 自动填充并锁定地址输入
+    const inputField = document.getElementById(targetField);
+    inputField.value = address;
+    inputField.readOnly = true;  // 禁止手动修改地址
+    
+    // 视觉反馈
+    inputField.style.backgroundColor = '#f8f9fa';
+    inputField.style.cursor = 'not-allowed';
+} 
+</script>
+
+    <form method="POST">
+    <!-- 发件人选择 -->
+    <div class="form-group">
+        <label>发件人：</label>
+        <select name="senderID" class="form-control" 
+                onchange="fillAddress(this, 'dispatchaddr')" 
+                required>
+            <option value="">选择发件人</option>
+            {% for sender in addresser_list %}
+            <option value="{{ sender.UserID }}" 
+                    data-address="{{ sender.shippingaddr }}">
+                {{ sender.name }} ({{ sender.UserID }})
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- 发货地址（自动填充） -->
+    <div class="form-group">
+        <label>发货地址：</label>
+        <input type="text" id="dispatchaddr" name="dispatchaddr" 
+               class="form-control" required readonly>
+    </div>
+
+    <!-- 收件人选择 -->
+    <div class="form-group">
+        <label>收件人：</label>
+        <select name="recipientID" class="form-control"
+                onchange="fillAddress(this, 'reciptaddr')" 
+                required>
+            <option value="">选择收件人</option>
+            {% for recipient in recipient_list %}
+            <option value="{{ recipient.UserID }}" 
+                    data-address="{{ recipient.default_shippingaddr }}">
+                {{ recipient.name }} ({{ recipient.UserID }})
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- 收货地址（自动填充） -->
+    <div class="form-group">
+        <label>收货地址：</label>
+        <input type="text" id="reciptaddr" name="reciptaddr" 
+               class="form-control" required readonly>
+    </div>
+
+    <!-- 货物ID输入 -->
+    <div class="form-group">
+        <label>货物编号(请输入大写字母C开头的8位字母数字组合):</label>
+        <input type="text" name="commodityID" 
+               class="form-control" 
+               pattern="C[A-Z0-9]{7}" 
+               title="请输入以C开头的8位字母数字组合"
+               required>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">
+        <i class="fas fa-check-circle"></i> 提交订单
+    </button>
+</form>
+</body>
+</html>

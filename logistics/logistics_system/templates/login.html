@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户登录 - 快递管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #F8F9FA;
+            color: #2C3E50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-card {
+            background: white;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            width: 360px;
+        }
+
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #2A5C82;
+        }
+
+        .login-card label {
+            display: block;
+            margin: 1rem 0 0.5rem;
+            font-weight: bold;
+        }
+
+        .login-card input[type="text"],
+        .login-card input[type="password"] {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .login-card button {
+            width: 100%;
+            background: #2A5C82;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .login-card button:hover {
+            background: #1A4466;
+        }
+
+        .login-card p {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .login-card a {
+            color: #2A5C82;
+            text-decoration: none;
+        }
+
+        .login-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div style="color: green; margin-bottom: 1rem;">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+        <h2><i class="fas fa-sign-in-alt"></i> 用户登录</h2>
+        <form method="POST">
+            <label for="adminID">管理员ID</label>
+            <input type="text" name="adminid" required>
+
+            <label for="password">密码</label>
+            <input type="password" name="password" required>
+
+            <button type="submit">登录</button>
+        </form>
+        <p>还没有账户？<a href="{{ url_for('register') }}">点击注册</a></p>
+    </div>
+</body>
+</html>
